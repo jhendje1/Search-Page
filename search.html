@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+    <title>ListingSearchPage</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie-edge">
+    <head>
+        <link rel="stylesheet" type="text/css" href="search.css">
+        <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js" ></script>
+
+       <!--<script type="text/javascript" src="/Users/jeanhendje/SearchApp/assets/js/app.js"></script>
+       <script type="text/javascript" src="/Users/jeanhendje/SearchApp/assets/js/listingSearch.js"></script>-->
+    </head>
+    <body>
+        <div class='search-menu'> 
+            <input type="text" placeholder="search by address, price" name="filterSearch" id="filterSearch">
+        </div>
+            <section id="content"></section>
+            <section id="searchResult"></section>
+    
+    <script type="text/javascript"> 
+    
+    function getListings() {
+    var xhr = new XMLHttpRequest();
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            responseObject = JSON.parse(xhr.responseText);
+
+
+            //BUILDING UP STRING WITH NEW CONTENT
+            var newContents = '';
+            for (var i = 0; i < responseObject.length; i++) { //loop through object
+
+                
+                newContents += '<div class="container">';
+                    newContents += '<div class="row">';
+                        newContents +=  '<div class="col-md-3">';
+                            newContents += '<img src="' + responseObject[i].display_image + '" alt="' + responseObject[i].id + '" style="width:80%; heigth:80%"/>';
+                            newContents += '<p><b>' + responseObject[i].address + '<b><p>';
+                                newContents += '<p><b>Status: ' + responseObject[i].display_status + '</b><br></p>';
+                                newContents += '<p>Price: ' + responseObject[i].price + '</p>';
+                                newContents += '<p>Bedrooms: ' + responseObject[i].unit.bedrooms + '</p>';
+                                newContents += '<p>Bathrooms: ' + responseObject[i].unit.bathrooms + '</p>';
+                                newContents += '</div>';
+                                newContents += '</div>';
+                                newContents += '</div>';
+                
+            }
+
+            console.log(responseObject);
+        }
+        document.getElementById('content').innerHTML = newContents;
+    }
+    xhr.open('GET', 'properties.json', true);
+    xhr.send();
+
+}
+getListings();
+/*-------------------------Filtered Search----------------------------------------------------------*/
+const searchField = document.getElementById('filterSearch');
+console.log(searchField);
+const searchResultsContainer = document.getElementById('searchResult');
+
+let responseObject = [];
+searchField.addEventListener('keyup', function(e){
+
+    const searchString = e.target.value.toLowerCase();
+    const filteredList = responseObject.filter((listingItem) =>{
+        //console.log(filteredList);
+        console.log(searchString);
+            if((searchField) && ((listingItem.address.toLowerCase().includes(searchString))) ||
+            (listingItem.display_status && listingItem.display_status.toLowerCase().includes(searchString)) ){
+
+        return true;
+    }else{
+        return false;
+    }
+    });
+    
+    console.log(filteredList);
+getListings(filteredList);
+});
+
+
+
+const displayfilteredListings = (listings) =>{
+    const htmlContent = listings
+    .map((listings) =>{
+        return `
+        <div class="container">
+                <div class="row">
+                <div class="col-md-3">
+                <img src="responseObject[i].display_image + '" alt="' + responseObject[i].id + '" />
+                <p><b>' + responseObject[i].address + '<b><p>
+                <p><b>Status: ' + responseObject[i].display_status + '</b><br></p>
+                <p>Price: ' + responseObject[i].price + '</p>
+                <p>Bedrooms: ' + responseObject[i].unit.bedrooms + '</p>
+                <p>Bathrooms: ' + responseObject[i].unit.bathrooms + '</p>
+                </div>
+                </div>
+                </div>
+                `
+                ;
+            })
+            .join('');
+            searchField.innerHTML = htmlContent;
+        }
+ </script>
+    </body>
+    
+</html>
